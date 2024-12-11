@@ -1,0 +1,36 @@
+import flet as ft
+
+def get_register_screen(change_screen, db):
+    def on_register_click(e):
+        # Adiciona o usuário ao Firebase
+        if reg_username.value and reg_password.value:
+            db.collection("users").add({
+                "username": reg_username.value,
+                "password": reg_password.value
+            })
+            change_screen("login")
+        else:
+            register_error.value = "Preencha todos os campos!"
+            register_error.update()
+
+    reg_username = ft.TextField(label="Usuário", autofocus=True)
+    reg_password = ft.TextField(label="Senha", password=True, can_reveal_password=True)
+    register_error = ft.Text(value="", color="red")
+
+    return ft.View(
+        "/register",
+        controls=[
+            ft.Column(
+                [
+                    ft.Text("Registrar-se", size=30, weight="bold"),
+                    reg_username,
+                    reg_password,
+                    register_error,
+                    ft.ElevatedButton("Registrar", on_click=on_register_click),
+                    ft.TextButton("Voltar ao Login", on_click=lambda _: change_screen("login")),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        ]
+    )
