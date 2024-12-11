@@ -1,0 +1,34 @@
+import flet as ft
+
+def get_login_screen(change_screen, db):
+    def on_login_click(e):
+        # Verifica as credenciais no Firebase
+        users_ref = db.collection("users")
+        docs = users_ref.where("username", "==", username_input.value).where("password", "==", password_input.value).stream()
+        if any(docs):
+            change_screen("main")
+        else:
+            login_error.value = "Credenciais inválidas!"
+            login_error.update()
+
+    username_input = ft.TextField(label="Usuário", autofocus=True)
+    password_input = ft.TextField(label="Senha", password=True, can_reveal_password=True)
+    login_error = ft.Text(value="", color="red")
+
+    return ft.View(
+        "/login",
+        controls=[
+            ft.Column(
+                [
+                    ft.Text("Login", size=30, weight="bold"),
+                    username_input,
+                    password_input,
+                    login_error,
+                    ft.ElevatedButton("Entrar", on_click=on_login_click),
+                    ft.TextButton("Registrar-se", on_click=lambda _: change_screen("register")),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        ]
+    )
