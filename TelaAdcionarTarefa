@@ -1,0 +1,161 @@
+import 'package:flutter/material.dart';
+
+class TarefaPage extends StatefulWidget {
+  @override
+  _TarefaPageState createState() => _TarefaPageState();
+}
+
+class _TarefaPageState extends State<TarefaPage> {
+  DateTime? datePicked1;
+  DateTime? datePicked2;
+  TextEditingController txtTituloTextController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Adicionar Tarefa'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                'Título',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            TextField(
+              controller: txtTituloTextController,
+              decoration: InputDecoration(
+                hintText: 'Digite o título da tarefa',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                'Data',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                final _datePicked1 = await showDatePicker(
+                  context: context,
+                  initialDate: datePicked1 ?? DateTime.now(),
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime(2100),
+                );
+                if (_datePicked1 != null) {
+                  setState(() {
+                    datePicked1 = _datePicked1;
+                  });
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      datePicked1 != null
+                          ? '${datePicked1?.day}/${datePicked1?.month}/${datePicked1?.year}'
+                          : 'Selecione o dia',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    Icon(Icons.calendar_today),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                'Horário',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                final _timePicked2 = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(datePicked1 ?? DateTime.now()),
+                );
+                if (_timePicked2 != null) {
+                  setState(() {
+                    datePicked2 = DateTime(
+                      datePicked1?.year ?? DateTime.now().year,
+                      datePicked1?.month ?? DateTime.now().month,
+                      datePicked1?.day ?? DateTime.now().day,
+                      _timePicked2.hour,
+                      _timePicked2.minute,
+                    );
+                  });
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      datePicked2 != null
+                          ? '${datePicked2?.hour}:${datePicked2?.minute}'
+                          : 'Selecione o horário',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    Icon(Icons.timer),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                if (txtTituloTextController.text.isNotEmpty &&
+                    datePicked1 != null &&
+                    datePicked2 != null) {
+                  // Salvar tarefa
+                  print('Tarefa adicionada com sucesso!');
+                  showDialog(
+                    context: context,
+                    builder: (alertDialogContext) {
+                      return AlertDialog(
+                        title: Text('Informação'),
+                        content: Text('Tarefa adicionada com sucesso!'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(alertDialogContext),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Text('Salvar'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 14.0, horizontal: 24.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
