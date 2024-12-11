@@ -1,0 +1,28 @@
+import flet as ft
+from firebase_admin import credentials, firestore
+import firebase_admin
+from login_screen import get_login_screen
+from register_screen import get_register_screen
+from main_screen import get_main_screen
+
+# Inicialização do Firebase
+cred = credentials.Certificate("firebasecredencial.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+def main(page: ft.Page):
+    # Define o estado atual da tela
+    def change_screen(screen_name):
+        page.views.clear()
+        if screen_name == "login":
+            page.views.append(get_login_screen(change_screen, db))
+        elif screen_name == "register":
+            page.views.append(get_register_screen(change_screen, db))
+        elif screen_name == "main":
+            page.views.append(get_main_screen(change_screen, db))
+        page.update()
+
+    # Inicia na tela de login
+    change_screen("login")
+
+ft.app(target=main)
