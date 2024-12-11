@@ -1,0 +1,301 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class TelaEditarTarefaWidget extends StatefulWidget {
+  const TelaEditarTarefaWidget({
+    super.key,
+    required this.docTarefa,
+  });
+
+  final TarefasRecord? docTarefa;
+
+  @override
+  State<TelaEditarTarefaWidget> createState() => _TelaEditarTarefaWidgetState();
+}
+
+class _TelaEditarTarefaWidgetState extends State<TelaEditarTarefaWidget> {
+  late TextEditingController _txtTituloTextController;
+  late FocusNode _txtTituloFocusNode;
+  late DateTime? _varDia;
+  late DateTime? _varHora;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _txtTituloTextController = TextEditingController(text: widget.docTarefa?.titulo);
+    _txtTituloFocusNode = FocusNode();
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      setState(() {
+        _varDia = widget.docTarefa?.dia;
+        _varHora = widget.docTarefa?.hora;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _txtTituloTextController.dispose();
+    _txtTituloFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: Colors.white, // Substitua pela cor que você preferir
+        body: SafeArea(
+          top: true,
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent, // Modifique conforme necessário
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.chevron_left_sharp,
+                            color: Colors.black, // Ajuste a cor conforme necessário
+                            size: 24,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 16.0),
+                          child: Text(
+                            'Editar Tarefa',
+                            style: TextStyle(
+                              fontFamily: 'Readex Pro',
+                              letterSpacing: 0.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.0, top: 8.0),
+                  child: Text(
+                    'Titulo',
+                    style: TextStyle(
+                      fontFamily: 'Readex Pro',
+                      letterSpacing: 0.0,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: _txtTituloTextController,
+                    focusNode: _txtTituloFocusNode,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: 'Digite sua nova tarefa',
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey, // Customize conforme necessário
+                          width: 2,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.blue, // Customize conforme necessário
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.0, top: 16.0),
+                  child: Text(
+                    'Dia',
+                    style: TextStyle(
+                      fontFamily: 'Readex Pro',
+                      letterSpacing: 0.0,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () async {
+                    final _datePicked1Date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2050),
+                    );
+
+                    if (_datePicked1Date != null) {
+                      setState(() {
+                        _varDia = _datePicked1Date;
+                      });
+                    }
+                  },
+                  child: Container(
+                    width: 100,
+                    height: 49,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      border: Border.all(
+                        color: Colors.black, // Customize conforme necessário
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _varDia != null
+                                ? '${_varDia!.day}/${_varDia!.month}/${_varDia!.year}'
+                                : 'Escolha o dia',
+                            style: TextStyle(
+                              fontFamily: 'Readex Pro',
+                              letterSpacing: 0.0,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.calendar_today,
+                              color: Colors.black, // Customize conforme necessário
+                              size: 24,
+                            ),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.0, top: 16.0),
+                  child: Text(
+                    'Horario',
+                    style: TextStyle(
+                      fontFamily: 'Readex Pro',
+                      letterSpacing: 0.0,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 16.0),
+                  child: InkWell(
+                    onTap: () async {
+                      final _timePicked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+
+                      if (_timePicked != null) {
+                        setState(() {
+                          _varHora = DateTime(
+                            _varDia?.year ?? DateTime.now().year,
+                            _varDia?.month ?? DateTime.now().month,
+                            _varDia?.day ?? DateTime.now().day,
+                            _timePicked.hour,
+                            _timePicked.minute,
+                          );
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: 100,
+                      height: 49,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: Colors.black, // Customize conforme necessário
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _varHora != null
+                                  ? '${_varHora!.hour}:${_varHora!.minute}'
+                                  : 'Escolha o horário',
+                              style: TextStyle(
+                                fontFamily: 'Readex Pro',
+                                letterSpacing: 0.0,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.timer_sharp,
+                                color: Colors.black, // Customize conforme necessário
+                                size: 24,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 32.0),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      var confirmDialogResponse = await showDialog<bool>(
+                        context: context,
+                        builder: (alertDialogContext) {
+                          return AlertDialog(
+                            title: Text('Alerta'),
+                            content: Text('Deseja deletar?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                child: Text('Não'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                child: Text('Sim'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (confirmDialogResponse == true) {
+                        // Ação de deletar
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text('Deletar'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
